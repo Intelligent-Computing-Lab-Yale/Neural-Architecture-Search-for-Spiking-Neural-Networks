@@ -1,5 +1,5 @@
 # Neural Architecture Search for Spiking Neural Networks
-Anonymous code for [Neural Architecture Search for Spiking Neural Networks]
+Pytorch implementation code for [Neural Architecture Search for Spiking Neural Networks]
 
 ## Prerequisites
 * Python 3.9    

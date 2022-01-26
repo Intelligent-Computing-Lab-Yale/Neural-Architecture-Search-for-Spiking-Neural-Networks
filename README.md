@@ -1,6 +1,7 @@
 # Neural Architecture Search for Spiking Neural Networks
 Pytorch implementation code for [Neural Architecture Search for Spiking Neural Networks] (https://arxiv.org/abs/2201.10355)
 
+For getting knowledge on NAS without training in ANN domain (refer: https://github.com/BayesWatch/nas-without-training)
 ## Prerequisites
 * Python 3.9    
 * PyTorch 1.10.0     

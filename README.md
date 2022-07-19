@@ -54,13 +54,13 @@ simple argument instruction
 
 ### Testing (on pretrained model)
 
-* As a first step, download pretrained parameters ([link][e]) to ```./savemodel/save_cifar100_bw.pth.tar```   
+(1) download pretrained parameters ([link][e]) to ```./savemodel/save_cifar100_bw.pth.tar```   
 
 [e]: https://drive.google.com/file/d/1pnS0nFMk2KlxTFeeVT5fYMdTPh_8qn84/view?usp=sharing
 
-* The above pretrained model is for CIFAR100 / architecture ``--cnt_mat 0302 0030 3003 0000``
+(2) The above pretrained model is for CIFAR100 / architecture ``--cnt_mat 0302 0030 3003 0000``
 
-*  Run the following command
+(3)  Run the following command
 
 ```
 python search_snn.py  --dataset 'cifar100' --cnt_mat 0302 0030 3003 0000 --savemodel_pth './savemodel/save_cifar100_bw.pth.tar'  --celltype 'backward'

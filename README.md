@@ -57,9 +57,11 @@ simple argument instruction
 (1) download pretrained parameters 
 
 CIFAR10: ([link][e]) to ```./savemodel/save_cifar10_bw.pth.tar```   
+
 [e]: https://drive.google.com/file/d/1pnS0nFMk2KlxTFeeVT5fYMdTPh_8qn84/view?usp=sharing
 
 CIFAR100: ([link][e]) to ```./savemodel/save_cifar100_bw.pth.tar```   
+
 [e]: https://drive.google.com/file/d/1pnS0nFMk2KlxTFeeVT5fYMdTPh_8qn84/view?usp=sharing
 
 (2) The above pretrained model is for 

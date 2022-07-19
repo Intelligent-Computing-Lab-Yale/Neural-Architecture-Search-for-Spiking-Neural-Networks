@@ -52,9 +52,11 @@ simple argument instruction
 
 --num_search: number of architecture candidates for searching
 
-### Testing (on pretrained model)
+### Testing with pretrained models (CIFAR10 & CIFAR100)
 
-(1) download pretrained parameters ([link][e]) to ```./savemodel/save_cifar100_bw.pth.tar```   
+(1) download pretrained parameters 
+
+CIFAR100: ([link][e]) to ```./savemodel/save_cifar100_bw.pth.tar```   
 
 [e]: https://drive.google.com/file/d/1pnS0nFMk2KlxTFeeVT5fYMdTPh_8qn84/view?usp=sharing
 

@@ -78,5 +78,22 @@ python search_snn.py  --dataset 'cifar10' --cnt_mat 0303 0030 2002 0200 --savemo
 python search_snn.py  --dataset 'cifar100' --cnt_mat 0302 0030 3003 0000 --savemodel_pth './savemodel/save_cifar100_bw.pth.tar'  --celltype 'backward'
 ```
 
+## Acknowledgement 
+Hamming distance measurement codes are referred from: 
+https://github.com/BayesWatch/nas-without-training
+
+Spiking Jelly reference: 
+https://github.com/fangwei123456/spikingjelly
+
+## Citation
+```
+@article{kim2022neural,
+  title={Neural architecture search for spiking neural networks},
+  author={Kim, Youngeun and Li, Yuhang and Park, Hyoungseob and Venkatesha, Yeshwanth and Panda, Priyadarshini},
+  journal={arXiv preprint arXiv:2201.10355},
+  year={2022}
+}
+```       
+
  
 

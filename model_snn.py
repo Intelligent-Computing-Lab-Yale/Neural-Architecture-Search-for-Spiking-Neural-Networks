@@ -3,6 +3,8 @@ import torch.nn as nn
 import numpy as np
 from spikingjelly.clock_driven import functional, layer, surrogate, neuron
 from searchcells.search_cell_snn import Neuronal_Cell,Neuronal_Cell_backward
+import matplotlib.pyplot as plt
+
 
 def logdet(K):
     s, ld = np.linalg.slogdet(K)
@@ -59,7 +61,7 @@ def find_best_neuroncell(args, trainset):
 
                 full_matrix = torch.ones((search_batchsize, search_batchsize)).cuda() * neuron_num
                 sparsity = (x.sum(1)/neuron_num).unsqueeze(1)
-                norm_K = ((sparsity @ (1-sparsity.t())) + ((1-sparsity) @ sparsity.t())) 
+                norm_K = ((sparsity @ (1-sparsity.t())) + ((1-sparsity) @ sparsity.t())) * neuron_num
                 rescale_factor = torch.div(0.5* torch.ones((search_batchsize, search_batchsize)).cuda(), norm_K+1e-3)
                 K1_0 = (x @ (1 - x.t()))
                 K0_1 = ((1-x) @ x.t())
@@ -123,6 +125,7 @@ class SNASNet(nn.Module):
             self.in_channel = 3
             self.img_size = 32
             self.first_out_channel = 128
+            self.channel_ratio = 2
             self.spatial_decay = 2 *self.second_avgpooling
             self.classifier_inter_ch = 1024
             self.stem_stride = 1
@@ -132,6 +135,7 @@ class SNASNet(nn.Module):
             self.num_cluster = 5
             self.in_channel = 3
             self.img_size = 32
+            self.channel_ratio = 1
             self.first_out_channel = 128
             self.spatial_decay = 2 *self.second_avgpooling
             self.classifier_inter_ch = 1024
@@ -143,45 +147,46 @@ class SNASNet(nn.Module):
             self.in_channel = 3
             self.img_size = 64
             self.first_out_channel = 128
+            self.channel_ratio = 1
             self.spatial_decay = 4 * self.second_avgpooling
             self.classifier_inter_ch = 4096
             self.stem_stride = 2
 
         self.stem = nn.Sequential(
-            nn.Conv2d(self.in_channel, self.first_out_channel, kernel_size=3, stride=self.stem_stride, padding=1, bias=False),
-            nn.BatchNorm2d(self.first_out_channel, affine=True),
+            nn.Conv2d(self.in_channel, self.first_out_channel*self.channel_ratio, kernel_size=3, stride=self.stem_stride, padding=1, bias=False),
+            nn.BatchNorm2d(self.first_out_channel*self.channel_ratio, affine=True),
         )
 
         if args.celltype == "forward":
-            self.cell1 = Neuronal_Cell(args, self.first_out_channel, self.first_out_channel, self.con_mat)
+            self.cell1 = Neuronal_Cell(args, self.first_out_channel*self.channel_ratio, self.first_out_channel*self.channel_ratio, self.con_mat)
         elif args.celltype == "backward":
-            self.cell1 = Neuronal_Cell_backward(args, self.first_out_channel, self.first_out_channel, self.con_mat)
+            self.cell1 = Neuronal_Cell_backward(args, self.first_out_channel*self.channel_ratio, self.first_out_channel*self.channel_ratio, self.con_mat)
         else:
             print ("not implemented")
             exit()
 
         self.downconv1 = nn.Sequential(
-            nn.BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+            nn.BatchNorm2d(128*self.channel_ratio, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
             neuron.LIFNode(v_threshold=args.threshold, v_reset=0.0, tau= args.tau,
                                                       surrogate_function=surrogate.ATan(),
                                                       detach_reset=True),
-                                        nn.Conv2d(128, 256, kernel_size=(3, 3),
+                                        nn.Conv2d(128*self.channel_ratio, 256*self.channel_ratio, kernel_size=(3, 3),
                                                   stride=(1, 1), padding=(1,1), bias=False),
-                                        nn.BatchNorm2d(256, eps=1e-05, momentum=0.1,
+                                        nn.BatchNorm2d(256*self.channel_ratio, eps=1e-05, momentum=0.1,
                                                        affine=True, track_running_stats=True)
                                         )
         self.resdownsample1 = nn.AvgPool2d(2,2)
 
         if args.celltype == "forward":
-            self.cell2 = Neuronal_Cell(args, 256, 256, self.con_mat)
+            self.cell2 = Neuronal_Cell(args, 256*self.channel_ratio, 256*self.channel_ratio, self.con_mat)
         elif args.celltype == "backward":
-            self.cell2 = Neuronal_Cell_backward(args, 256, 256, self.con_mat)
+            self.cell2 = Neuronal_Cell_backward(args, 256*self.channel_ratio, 256*self.channel_ratio, self.con_mat)
         else:
             print ("not implemented")
             exit()
 
         self.last_act = nn.Sequential(
-                        nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
+                        nn.BatchNorm2d(256*self.channel_ratio, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True),
                         neuron.LIFNode(v_threshold=args.threshold, v_reset=0.0, tau=args.tau,
                                        surrogate_function=surrogate.ATan(),
                                        detach_reset=True)
@@ -190,7 +195,7 @@ class SNASNet(nn.Module):
 
         self.classifier = nn.Sequential(
             layer.Dropout(0.5),
-            nn.Linear(256*(self.img_size//self.spatial_decay)*(self.img_size//self.spatial_decay), self.classifier_inter_ch, bias=False),
+            nn.Linear(256*self.channel_ratio*(self.img_size//self.spatial_decay)*(self.img_size//self.spatial_decay), self.classifier_inter_ch, bias=False),
             neuron.LIFNode(v_threshold=args.threshold, v_reset=0.0, tau=args.tau,
                            surrogate_function=surrogate.ATan(),
                            detach_reset=True),
@@ -228,7 +233,7 @@ class SNASNet(nn.Module):
             x = x.view(batch_size, -1)
             x = self.classifier(x)
             acc_voltage = acc_voltage + self.boost(x.unsqueeze(1)).squeeze(1)
-        acc_voltage = acc_voltage/self.total_timestep
+        acc_voltage = acc_voltage / self.total_timestep
         return acc_voltage
 
 
@@ -239,39 +244,3 @@ class SNASNet(nn.Module):
         self.cell2.last_xin = 0.
         self.cell2.last_x1 = 0.
         self.cell2.last_x2 = 0.
-        neuron_type = 'LIFNode'
-        for name, module in self.cell1.named_modules():
-            if neuron_type in str(type(module)):
-                module.v = 0.
-            if 'Dropout' in str(type(module)):
-                module.mask = None
-        for name, module in self.downconv1.named_modules():
-            if neuron_type in str(type(module)):
-                module.v = 0.
-            if 'Dropout' in str(type(module)):
-                module.mask = None
-        for name, module in self.resdownsample1.named_modules():
-            if neuron_type in str(type(module)):
-                module.v = 0.
-            if 'Dropout' in str(type(module)):
-                module.mask = None
-        for name, module in self.cell2.named_modules():
-            if neuron_type in str(type(module)):
-                module.v = 0.
-            if 'Dropout' in str(type(module)):
-                module.mask = None
-        for name, module in self.resdownsample2.named_modules():
-            if neuron_type in str(type(module)):
-                module.v = 0.
-            if 'Dropout' in str(type(module)):
-                module.mask = None
-        for name, module in self.last_act.named_modules():
-            if neuron_type in str(type(module)):
-                module.v = 0.
-            if 'Dropout' in str(type(module)):
-                module.mask = None
-        for name, module in self.classifier.named_modules():
-            if neuron_type in str(type(module)):
-                module.v = 0.
-            if 'Dropout' in str(type(module)):
-                module.mask = None

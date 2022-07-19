@@ -67,7 +67,8 @@ CIFAR100: ([link][e]) to ```./savemodel/save_cifar100_bw.pth.tar```
 ```
 python search_snn.py  --dataset 'cifar100' --cnt_mat 0302 0030 3003 0000 --savemodel_pth './savemodel/save_cifar100_bw.pth.tar'  --celltype 'backward'
 ```
-
-
+```
+python search_snn.py  --dataset 'cifar10' --cnt_mat 0303 0030 2002 0200 --savemodel_pth './savemodel/save_cifar10_bw.pth.tar'  --celltype 'backward' --batch_size 32
+```
  
 

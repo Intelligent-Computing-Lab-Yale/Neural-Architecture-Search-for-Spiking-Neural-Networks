@@ -56,19 +56,25 @@ simple argument instruction
 
 (1) download pretrained parameters 
 
-CIFAR100: ([link][e]) to ```./savemodel/save_cifar100_bw.pth.tar```   
-
+CIFAR10: ([link][e]) to ```./savemodel/save_cifar10_bw.pth.tar```   
 [e]: https://drive.google.com/file/d/1pnS0nFMk2KlxTFeeVT5fYMdTPh_8qn84/view?usp=sharing
 
-(2) The above pretrained model is for CIFAR100 / architecture ``--cnt_mat 0302 0030 3003 0000``
+CIFAR100: ([link][e]) to ```./savemodel/save_cifar100_bw.pth.tar```   
+[e]: https://drive.google.com/file/d/1pnS0nFMk2KlxTFeeVT5fYMdTPh_8qn84/view?usp=sharing
+
+(2) The above pretrained model is for 
+
+CIFAR10 architecture ``--cnt_mat 0303 0030 2002 0200``
+
+CIFAR100 architecture ``--cnt_mat 0302 0030 3003 0000``
 
 (3)  Run the following command
-
+```
+python search_snn.py  --dataset 'cifar10' --cnt_mat 0303 0030 2002 0200 --savemodel_pth './savemodel/save_cifar10_bw.pth.tar'  --celltype 'backward' --second_avgpooling 4
+```
 ```
 python search_snn.py  --dataset 'cifar100' --cnt_mat 0302 0030 3003 0000 --savemodel_pth './savemodel/save_cifar100_bw.pth.tar'  --celltype 'backward'
 ```
-```
-python search_snn.py  --dataset 'cifar10' --cnt_mat 0303 0030 2002 0200 --savemodel_pth './savemodel/save_cifar10_bw.pth.tar'  --celltype 'backward' --batch_size 32
-```
+
  
 

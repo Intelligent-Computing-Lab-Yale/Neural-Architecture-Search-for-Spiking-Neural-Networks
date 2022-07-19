@@ -59,7 +59,7 @@ def find_best_neuroncell(args, trainset):
 
                 full_matrix = torch.ones((search_batchsize, search_batchsize)).cuda() * neuron_num
                 sparsity = (x.sum(1)/neuron_num).unsqueeze(1)
-                norm_K = ((sparsity @ (1-sparsity.t())) + ((1-sparsity) @ sparsity.t())) *neuron_num
+                norm_K = ((sparsity @ (1-sparsity.t())) + ((1-sparsity) @ sparsity.t())) 
                 rescale_factor = torch.div(0.5* torch.ones((search_batchsize, search_batchsize)).cuda(), norm_K+1e-3)
                 K1_0 = (x @ (1 - x.t()))
                 K0_1 = ((1-x) @ x.t())

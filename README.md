@@ -52,7 +52,7 @@ simple argument instruction
 
 --num_search: number of architecture candidates for searching
 
-### Testing with pretrained models (CIFAR10 & CIFAR100)
+## Testing with pretrained models (CIFAR10 & CIFAR100)
 
 (1) download pretrained parameters 
 

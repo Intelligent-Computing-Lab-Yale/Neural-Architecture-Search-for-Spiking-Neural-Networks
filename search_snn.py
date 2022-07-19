@@ -9,6 +9,7 @@ import numpy as np
 import random
 from model_snn import SNASNet, find_best_neuroncell
 from utils import data_transforms
+from spikingjelly.clock_driven.functional import reset_net
 
 
 def main():
@@ -128,6 +129,7 @@ def train(args, epoch, train_data,  model, criterion, optimizer, scheduler):
         n = inputs.size(0)
         top1.update(prec1.item(), n)
         train_loss += loss.item()
+        reset_net(model)
     print('train_loss: %.6f' % (train_loss / len(train_data)), 'train_acc: %.6f' % top1.avg)
 
 
@@ -145,6 +147,7 @@ def validate(args, epoch, val_data, model, criterion):
             prec1, prec5 = utils.accuracy(outputs, targets, topk=(1, 5))
             n = inputs.size(0)
             val_top1.update(prec1.item(), n)
+            reset_net(model)
         print('[Val_Accuracy epoch:%d] val_acc:%f'
               % (epoch + 1,  val_top1.avg))
         return val_top1.avg
